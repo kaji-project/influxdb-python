@@ -8,15 +8,15 @@ Priority: optional
 Build-Depends: debhelper (>= 8),
                dh-python,
                python-all,
-               python-setuptools,
-               python-requests (>= 1.0.3),
+#               python-setuptools,
+#               python-requests (>= 1.0.3),
                python-mock,
-               python-nose,
-               python3-all,
-               python3-setuptools,
-               python3-requests,
-               python3-mock,
-               python3-nose
+#               python-nose,
+#               python3-all,
+#               python3-setuptools,
+#               python3-requests,
+#               python3-mock,
+#               python3-nose
 Standards-Version: 3.9.5
 
 Package: python-influxdb
