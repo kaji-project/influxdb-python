@@ -1,3 +1,9 @@
+influxdb-python (0.1.12-1kaji0.2) unstable; urgency=medium
+
+  * Kaji release
+
+ -- Thibault Cohen <titilambert@savoirfairelinux.com>  Sun, 12 Oct 2014 22:44:56 -0400
+
 influxdb-python (0.1.10-1) unstable; urgency=low
 
   * New upstream version.
