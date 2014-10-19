@@ -1,6 +1,8 @@
 Source: influxdb-python
 Maintainer: Alexandre Viau <alexandre@alexandreviau.net>
 Homepage: https://pypi.python.org/pypi/influxdb
+Vcs-Browser: http://anonscm.debian.org/gitweb/?p=collab-maint/influxdb-python.git
+Vcs-Git: git://anonscm.debian.org/collab-maint/influxdb-python.git
 Section: python
 X-Python-Version: >= 2.7
 X-Python3-Version: >= 3.3
