@@ -1,5 +1,6 @@
 influxdb-python (0.1.13-1) unstable; urgency=low
 
   * Released new upstream version
+  * Disabled tests until python-requests-mock >=0.5.1 is released
 
  -- Alexandre Viau <alexandre@alexandreviau.net>  Wed, 12 Nov 2014 17:03:35 -0500
