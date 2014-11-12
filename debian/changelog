@@ -1,6 +1,5 @@
-influxdb-python (0.1.12-1) unstable; urgency=low
+influxdb-python (0.1.13-1) unstable; urgency=low
 
-  * Initial release (Closes: #764643)
+  * Released new upstream version
 
- -- Alexandre Viau <alexandre@alexandreviau.net>  Fri, 10 Oct 2014 12:56:09 -0400
-
+ -- Alexandre Viau <alexandre@alexandreviau.net>  Wed, 12 Nov 2014 17:03:35 -0500
