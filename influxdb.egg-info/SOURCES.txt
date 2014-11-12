@@ -1,8 +1,11 @@
 MANIFEST.in
+README.rst
+dev-requirements.txt
 requirements.txt
 setup.py
 test-requirements.txt
 influxdb/__init__.py
+influxdb/chunked_json.py
 influxdb/client.py
 influxdb.egg-info/PKG-INFO
 influxdb.egg-info/SOURCES.txt

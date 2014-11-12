@@ -1,10 +1,18 @@
 # -*- coding: utf-8 -*-
 """
-python client for influxdb
+Python client for InfluxDB
 """
 import json
 import socket
 import requests
+
+from influxdb import chunked_json
+
+try:
+    xrange
+except NameError:
+    xrange = range
+
 session = requests.Session()
 
 
@@ -18,8 +26,34 @@ class InfluxDBClientError(Exception):
 
 
 class InfluxDBClient(object):
+
     """
-    InfluxDB Client
+    The ``InfluxDBClient`` object holds information necessary to connect
+    to InfluxDB. Requests can be made to InfluxDB directly through the client.
+
+    :param host: hostname to connect to InfluxDB, defaults to 'localhost'
+    :type host: string
+    :param port: port to connect to InfluxDB, defaults to 'localhost'
+    :type port: int
+    :param username: user to connect, defaults to 'root'
+    :type username: string
+    :param password: password of the user, defaults to 'root'
+    :type password: string
+    :param database: database name to connect to, defaults is None
+    :type database: string
+    :param ssl: use https instead of http to connect to InfluxDB, defaults is
+        False
+    :type ssl: boolean
+    :param verify_ssl: verify SSL certificates for HTTPS requests, defaults is
+        False
+    :type verify_ssl: boolean
+    :param timeout: number of seconds Requests will wait for your client to
+        establish a connection, defaults to None
+    :type timeout: int
+    :param use_udp: use UDP to connect to InfluxDB, defaults is False
+    :type use_udp: int
+    :param udp_port: UDP port to connect to InfluxDB, defaults is 4444
+    :type udp_port: int
     """
 
     def __init__(self,
@@ -34,7 +68,7 @@ class InfluxDBClient(object):
                  use_udp=False,
                  udp_port=4444):
         """
-        Initialize client
+        Construct a new InfluxDBClient object.
         """
         self._host = host
         self._port = port
@@ -68,28 +102,31 @@ class InfluxDBClient(object):
 
     def switch_db(self, database):
         """
-        Change client database
+        switch_db()
 
-        Parameters
-        ----------
-        database : string
+        Change client database.
+
+        :param database: the new database name to switch to
+        :type database: string
         """
         self._database = database
 
     def switch_user(self, username, password):
         """
-        Change client username
+        switch_user()
 
-        Parameters
-        ----------
-        username : string
-        password : string
+        Change client username.
+
+        :param username: the new username to switch to
+        :type username: string
+        :param password: the new password to switch to
+        :type password: string
         """
         self._username = username
         self._password = password
 
     def request(self, url, method='GET', params=None, data=None,
-                status_code=200):
+                expected_response_code=200):
         """
         Make a http request to API
         """
@@ -116,9 +153,9 @@ class InfluxDBClient(object):
             headers=self._headers,
             verify=self._verify_ssl,
             timeout=self._timeout
-            )
+        )
 
-        if response.status_code == status_code:
+        if response.status_code == expected_response_code:
             return response
         else:
             raise InfluxDBClientError(response.content, response.status_code)
@@ -131,21 +168,21 @@ class InfluxDBClient(object):
 
     def write_points(self, *args, **kwargs):
         """
-        Write to multiple time series names
+        write_points()
 
-        Parameters
-        ----------
-        batch_size : Optional. Int value to write the points in batches instead
-            of all at one time.
-            Useful for when doing data dumps from one database to another or
-            when doing a massive write operation
+        Write to multiple time series names.
+
+        :param batch_size: [Optional] Value to write the points in batches
+            instead of all at one time. Useful for when doing data dumps from
+            one database to another or when doing a massive write operation
+        :type batch_size: int
         """
 
         def list_chunks(l, n):
             """ Yield successive n-sized chunks from l.
             """
             for i in xrange(0, len(l), n):
-                yield l[i:i+n]
+                yield l[i:i + n]
 
         batch_size = kwargs.get('batch_size')
         if batch_size:
@@ -177,6 +214,11 @@ class InfluxDBClient(object):
             raise Exception(
                 "Invalid time precision is given. (use 's', 'm', 'ms' or 'u')")
 
+        if self.use_udp and time_precision != 's':
+            raise Exception(
+                "InfluxDB only supports seconds precision for udp writes"
+            )
+
         url = "db/{0}/series".format(self._database)
 
         params = {
@@ -191,8 +233,8 @@ class InfluxDBClient(object):
                 method='POST',
                 params=params,
                 data=data,
-                status_code=200
-                )
+                expected_response_code=200
+            )
 
         return True
 
@@ -207,8 +249,8 @@ class InfluxDBClient(object):
         self.request(
             url=url,
             method='DELETE',
-            status_code=204
-            )
+            expected_response_code=204
+        )
 
         return True
 
@@ -279,16 +321,13 @@ class InfluxDBClient(object):
             url=url,
             method='GET',
             params=params,
-            status_code=200
-            )
+            expected_response_code=200
+        )
 
-        try:
-            res = json.loads(response.content)
-        except TypeError:
-            # must decode in python 3
-            res = json.loads(response.content.decode('utf8'))
-
-        return res
+        if chunked:
+            return list(chunked_json.loads(response.content.decode()))
+        else:
+            return response.json()
 
     # Creating and Dropping Databases
     #
@@ -300,12 +339,13 @@ class InfluxDBClient(object):
 
     def create_database(self, database):
         """
-        Create a database
+        create_database()
 
-        Parameters
-        ----------
-        database: string
-            database name
+        Create a database on the InfluxDB server.
+
+        :param database: the name of the database to create
+        :type database: string
+        :rtype: boolean
         """
         url = "db"
 
@@ -315,27 +355,28 @@ class InfluxDBClient(object):
             url=url,
             method='POST',
             data=data,
-            status_code=201
-            )
+            expected_response_code=201
+        )
 
         return True
 
     def delete_database(self, database):
         """
-        Drop a database
+        delete_database()
 
-        Parameters
-        ----------
-        database: string
-            database name
+        Drop a database on the InfluxDB server.
+
+        :param database: the name of the database to delete
+        :type database: string
+        :rtype: boolean
         """
         url = "db/{0}".format(database)
 
         self.request(
             url=url,
             method='DELETE',
-            status_code=204
-            )
+            expected_response_code=204
+        )
 
         return True
 
@@ -351,32 +392,58 @@ class InfluxDBClient(object):
         response = self.request(
             url=url,
             method='GET',
-            status_code=200
-            )
+            expected_response_code=200
+        )
 
-        return json.loads(response.content)
+        return response.json()
 
     def delete_series(self, series):
         """
-        Drop a series
+        delete_series()
 
-        Parameters
-        ----------
-        series: string
-            series name
+        Drop a series on the InfluxDB server.
+
+        :param series: the name of the series to delete
+        :type series: string
+        :rtype: boolean
         """
         url = "db/{0}/series/{1}".format(
             self._database,
             series
-            )
+        )
 
         self.request(
             url=url,
             method='DELETE',
-            status_code=204
-            )
+            expected_response_code=204
+        )
 
         return True
+
+    def get_list_series(self):
+        """
+        Get a list of all time series in a database
+        """
+
+        response = self.query('list series')
+
+        series_list = []
+        for series in response[0]['points']:
+            series_list.append(series[1])
+
+        return series_list
+
+    def get_list_continuous_queries(self):
+        """
+        Get a list of continuous queries
+        """
+
+        response = self.query('list continuous queries')
+        queries_list = []
+        for query in response[0]['points']:
+            queries_list.append(query[2])
+
+        return queries_list
 
     # Security
     # get list of cluster admins
@@ -416,8 +483,8 @@ class InfluxDBClient(object):
         response = self.request(
             url="cluster_admins",
             method='GET',
-            status_code=200
-            )
+            expected_response_code=200
+        )
 
         return response.json()
 
@@ -434,8 +501,8 @@ class InfluxDBClient(object):
             url="cluster_admins",
             method='POST',
             data=data,
-            status_code=200
-            )
+            expected_response_code=200
+        )
 
         return True
 
@@ -453,8 +520,8 @@ class InfluxDBClient(object):
             url=url,
             method='POST',
             data=data,
-            status_code=200
-            )
+            expected_response_code=200
+        )
 
         return True
 
@@ -467,8 +534,8 @@ class InfluxDBClient(object):
         self.request(
             url=url,
             method='DELETE',
-            status_code=204
-            )
+            expected_response_code=200
+        )
 
         return True
 
@@ -493,8 +560,8 @@ class InfluxDBClient(object):
             url=url,
             method='POST',
             data=data,
-            status_code=200
-            )
+            expected_response_code=200
+        )
 
         return True
 
@@ -565,14 +632,16 @@ class InfluxDBClient(object):
         response = self.request(
             url=url,
             method='GET',
-            status_code=200
-            )
+            expected_response_code=200
+        )
 
         return response.json()
 
-    def add_database_user(self, new_username, new_password):
+    def add_database_user(self, new_username, new_password, permissions=None):
         """
         Add database user
+
+        :param permissions: A ``(readFrom, writeTo)`` tuple
         """
         url = "db/{0}/users".format(self._database)
 
@@ -581,12 +650,20 @@ class InfluxDBClient(object):
             'password': new_password
         }
 
+        if permissions:
+            try:
+                data['readFrom'], data['writeTo'] = permissions
+            except (ValueError, TypeError):
+                raise TypeError(
+                    "'permissions' must be (readFrom, writeTo) tuple"
+                )
+
         self.request(
             url=url,
             method='POST',
             data=data,
-            status_code=200
-            )
+            expected_response_code=200
+        )
 
         return True
 
@@ -604,8 +681,8 @@ class InfluxDBClient(object):
             url=url,
             method='POST',
             data=data,
-            status_code=200
-            )
+            expected_response_code=200
+        )
 
         if username == self._username:
             self._password = new_password
@@ -621,8 +698,8 @@ class InfluxDBClient(object):
         self.request(
             url=url,
             method='DELETE',
-            status_code=200
-            )
+            expected_response_code=200
+        )
 
         return True
 
