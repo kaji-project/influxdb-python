@@ -10,7 +10,7 @@ Source0:	%{name}_%{version}.orig.tar.gz
 
 BuildArch:  noarch
 
-BuildRequires: python
+BuildRequires: python-setuptools
 Requires: python
 
 %description
