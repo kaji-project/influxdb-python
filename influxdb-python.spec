@@ -11,7 +11,7 @@ Source0:	%{name}_%{version}.orig.tar.gz
 BuildArch:  noarch
 
 BuildRequires: python
-Requires python
+Requires: python
 
 %description
 Python client for InfluxDB
