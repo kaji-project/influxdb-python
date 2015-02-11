@@ -10,8 +10,11 @@ Source0:	%{name}_%{version}.orig.tar.gz
 
 BuildArch:  noarch
 
-BuildRequires: python
-Requires python
+BuildRequires: python 
+Requires: python
+
+# use to remove the dependency added by rpmbuild on python(abi)
+AutoReqProv: no
 
 %description
 Python client for InfluxDB
