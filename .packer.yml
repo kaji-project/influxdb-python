@@ -1,4 +1,4 @@
-distro:
-  - centos_6
-spec: influxdb-python.spec
-debian: debian
+centos_6:
+  spec: influxdb-python.spec
+debian_8:
+  debian: debian

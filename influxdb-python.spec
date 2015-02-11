@@ -10,8 +10,8 @@ Source0:	%{name}_%{version}.orig.tar.gz
 
 BuildArch:  noarch
 
-BuildRequires: python 
-Requires: python
+BuildRequires: python-setuptools
+Requires: python-requests
 
 # use to remove the dependency added by rpmbuild on python(abi)
 AutoReqProv: no
