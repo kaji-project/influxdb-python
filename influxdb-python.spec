@@ -13,6 +13,9 @@ BuildArch:  noarch
 BuildRequires: python-setuptools
 Requires: python-requests
 
+# use to remove the dependency added by rpmbuild on python(abi)
+AutoReqProv: no
+
 %description
 Python client for InfluxDB
  .
@@ -32,7 +35,7 @@ rm -rf  %{buildroot}/%{python_sitelib}/tests
 
 %files
 %{python_sitelib}/influxdb
-%{python_sitelib}/influxdb-%{version}-*.egg-info
+%{python_sitelib}/influxdb-%{version}-py2.7.egg-info
 
 %changelog
 * Wed Jan 28 2015 Sébastien Coavoux <sebastien.coavoux@savoirfairelinux.com> 0.1.12-1kaji0.2
