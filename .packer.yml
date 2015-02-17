@@ -1,4 +1,8 @@
 centos_6:
-  spec: influxdb-python.spec
+    spec: debian/influxdb-python.spec
+centos_7:
+    spec: debian/influxdb-python.spec
 debian_8:
-  debian: debian
+    debian: debian
+ubuntu_14.04:
+    debian: debian
