@@ -1,3 +1,10 @@
+influxdb-python (0.1.12-2kaji0.2) unstable; urgency=medium
+
+  * Kaji release
+
+ -- Sebastien Coavoux <sebastien.coavoux@savoirfairelinux.com>  Wed, 29 Apr 2015 16:42:56 -0400
+
+
 influxdb-python (0.1.12-1kaji0.2) unstable; urgency=medium
 
   * Kaji release
