@@ -1,6 +1,6 @@
 Name:		influxdb-python
 Version:	0.1.12
-Release:	2kaji0.2
+Release:	3kaji0.2
 Summary:	Python client for InfluxDB
 
 Group:		Network
@@ -37,6 +37,9 @@ rm -rf  %{buildroot}/%{python_sitelib}/tests
 %{python_sitelib}/influxdb*
 
 %changelog
+* Wed Apr 29 2015 Sébastien Coavoux <sebastien.coavoux@savoirfairelinux.com> 0.1.12-3kaji0.2
+- Fix Packaging
+
 * Wed Apr 29 2015 Sébastien Coavoux <sebastien.coavoux@savoirfairelinux.com> 0.1.12-2kaji0.2
 - New Release
 

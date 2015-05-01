@@ -4,4 +4,4 @@ export PYBUILD_NAME=influxdb
 export PYBUILD_TEST_TOX=0
 
 %:
-	dh $@ --with python2 --buildsystem=pybuild
+	dh $@ --with python2
